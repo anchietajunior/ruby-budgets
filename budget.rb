@@ -39,10 +39,10 @@ end
 
 def show_budget
   (puts "Month and year required" and return) unless ARGV[1] && ARGV[2]
-  budget_exists?(ARGV[1], ARGV[2]) ? mount_tables(ARGV[1], ARGV[2]) : "Budget not found"
+  budget_exists?(ARGV[1], ARGV[2]) ? mount_table_values(ARGV[1], ARGV[2]) : "Budget not found"
 end
 
-def mount_tables(month, year)
+def mount_table_values(month, year)
   incomes = []
   expenses = []
   File.open("./budgets/#{year}/#{month}.txt", "r") do |file|
@@ -52,8 +52,7 @@ def mount_tables(month, year)
       expenses  << ["#{desc}", value_to_float(value)] if type == "e"
     end
   end
-  table("Incomes", incomes) unless incomes.empty?
-  table("Expenses", expenses) unless expenses.empty?
+  table("Budget of #{month}/#{year}", incomes, expenses)
 end
 
 def value_to_float(value)
@@ -65,13 +64,23 @@ def format_value(value)
   ("R$ %.2f" % value).gsub(".", ",")
 end
 
-def table(title, values)
-  table = Terminal::Table.new :title => title, :headings => ['Description', 'Value'] do |t|
-    values.each do |value|
-      t << [value.first, format_value(value.last)]
+def table(title, incomes, expenses)
+  table = Terminal::Table.new :title => title do |t|
+    t << ['Income', 'Value']
+    t.add_separator
+    incomes.each do |income|
+      t << [income.first, format_value(income.last)]
     end
     t.add_separator
-    t << ['Total', format_value(values.reduce(0) { |sum, obj| sum + obj.last })]
+    t << ['Total Incomes', format_value(incomes.reduce(0) { |sum, obj| sum + obj.last })]
+    t.add_separator
+    t << ['Expense', 'Value']
+    t.add_separator
+    expenses.each do |expense|
+      t << [expense.first, format_value(expense.last)]
+    end
+    t.add_separator
+    t << ['Total Expenses', format_value(incomes.reduce(0) { |sum, obj| sum + obj.last })]
   end
   puts table
 end
