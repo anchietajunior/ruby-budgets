@@ -80,7 +80,7 @@ def table(title, incomes, expenses)
       t << [expense.first, format_value(expense.last)]
     end
     t.add_separator
-    t << ['Total Expenses', format_value(incomes.reduce(0) { |sum, obj| sum + obj.last })]
+    t << ['Total Expenses', format_value(expenses.reduce(0) { |sum, obj| sum + obj.last })]
   end
   puts table
 end
