@@ -96,16 +96,13 @@ def create_budget(month, year)
 end
 
 def list_budgets(year)
-  if year
-    files = Dir["./budgets/#{year}/**/*.txt"]
-    p files.count > 0 ? "Listing #{year} budgets" : "No Budgets"
-    files.each do |file_name|
-      if !File.directory?(file_name)
-        p File.basename(file_name.to_s, ".*")
-      end
+  (puts "Year required to list budgets" and return) unless year
+  files = Dir["./budgets/#{year}/**/*.txt"]
+  p files.count > 0 ? "Listing #{year} budgets" : "No Budgets"
+  files.each do |file_name|
+    if !File.directory?(file_name)
+      p File.basename(file_name.to_s, ".*")
     end
-  else
-    puts "Year required to list budgets"
   end
 end
 
