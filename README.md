@@ -2,6 +2,8 @@
 
 Create Budgets with Ruby from Terminal
 
+![Ruby Budgets](budget.gif)
+
 ## Show budget
 
 Command: ruby budget.rb -s month year
