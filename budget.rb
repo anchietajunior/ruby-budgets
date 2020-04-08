@@ -13,9 +13,9 @@ def init(option)
   when "-s"
     show_budget
   when "-i"
-    add_income(ARGV[1], ARGV[2])
+    add_income
   when "-e"
-    add_expense(ARGV[1], ARGV[2])
+    add_expense
   else
     puts "Option not found, you can: "
     puts "Create (-c)"
@@ -23,6 +23,18 @@ def init(option)
     puts "Add Income (-i)"
     puts "Add Expense (-e)"
   end
+end
+
+def add_income
+  (puts "Month, year, description and value required" and return) unless ARGV[1] && ARGV[2] && ARGV[3] && ARGV[4]
+  File.open("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt", 'a') { |file| file.write("i #{ARGV[3]} #{ARGV[4]}\n") }
+  p "Income added"
+end
+
+def add_expense
+  (puts "Month, year, description and value required" and return) unless ARGV[1] && ARGV[2] && ARGV[3] && ARGV[4]
+  File.open("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt", 'a') { |file| file.write("e #{ARGV[3]} #{ARGV[4]}\n") }
+  p "Expense added"
 end
 
 def show_budget
