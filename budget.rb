@@ -8,13 +8,13 @@ def init(option)
   case option
   when "-c"
     create_budget(ARGV[1], ARGV[2])
-  when "-l"
+  when "list"
     list_budgets(ARGV[1])
-  when "-s"
+  when "details"
     show_budget
-  when "-i"
+  when "income"
     add_income
-  when "-e"
+  when "expense"
     add_expense
   else
     puts "Option not found, you can: "
