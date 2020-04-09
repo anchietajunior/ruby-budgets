@@ -53,3 +53,19 @@ ruby budget.rb expense 03 2020 Internet 234,45
 ```
 
 This will create a file in ***budgets/2020/03.txt***.
+
+## Remove Income or Expense
+
+Command: ruby budget.rb remove type month year description
+
+Example:
+
+```sh
+ruby budget remove expense 03 2020 Internet
+```
+
+Example 2:
+
+```sh
+ruby budget remove income 03 2020 Salary
+```

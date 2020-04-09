@@ -14,31 +14,61 @@ def init(option)
     add_income
   when "expense"
     add_expense
+  when "remove"
+    remove_item
   else
     puts "Option not found, you can: "
-    puts "Create (-c)"
-    puts "List (-l)"
-    puts "Add Income (-i)"
-    puts "Add Expense (-e)"
+    puts "List (list)"
+    puts "Add Income (income)"
+    puts "Add Expense (expense)"
+    puts "Remove Item from Budget (remove)"
   end
 end
 
 def add_income
-  (puts "Month, year, description and value required" and return) unless ARGV[1] && ARGV[2] && ARGV[3] && ARGV[4]
+  return unless year_month_description_and_value?
+
   create_folder_and_file unless budget_exists?
   File.open("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt", 'a') { |file| file.write("i #{ARGV[3]} #{ARGV[4]}\n") }
   p "Income added"
 end
 
 def add_expense
-  (puts "Month, year, description and value required" and return) unless ARGV[1] && ARGV[2] && ARGV[3] && ARGV[4]
+  return unless year_month_description_and_value?
+
   create_folder_and_file unless budget_exists?
   File.open("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt", 'a') { |file| file.write("e #{ARGV[3]} #{ARGV[4]}\n") }
   p "Expense added"
 end
 
+def remove_item
+  return unless year_month_and_description? 
+  
+  file_lines = ''
+  type = ''
+  if ARGV[1] == 'income'
+    type = 'i'
+  elsif ARGV[1] == 'expense'
+    type = 'e'
+  else
+    puts "Type not found"
+    return
+  end
+
+  IO.readlines("./budgets/#{ARGV[3]}/#{ARGV[2]}.txt", "r") do |line|
+    item_type   = line.last.split(" ")[0]
+    description = line.last.split(" ")[1]
+    files_lines += line unless item_type == type && description == ARGV[4] 
+  end
+
+  File.open("./budgets/#{ARGV[3]}/#{ARGV[2]}.txt", "w") do |file|
+    file.puts file_lines
+  end
+end
+
 def show_budget
-  (puts "Month and year required" and return) unless ARGV[1] && ARGV[2]
+  return unless year_and_month? 
+
   budget_exists? ? mount_table_values(ARGV[1], ARGV[2]) : "Budget not found"
 end
 
@@ -103,6 +133,33 @@ end
 
 def budget_exists?
   File.exists?("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt")
+end
+
+def year_and_month?
+  if ARGV[1].nil? || ARGV[2].nil?
+    puts "Month and year required"
+    false
+  else
+    true
+  end
+end
+
+def year_month_and_description?
+  if ARGV[1].nil? || ARGV[2].nil? || ARGV[3].nil?
+    puts "Month, year and description required"
+    false
+  else
+    true
+  end
+end
+
+def year_month_description_and_value?
+  if ARGV[1].nil? || ARGV[2].nil? || ARGV[3].nil? || ARGV[4].nil?
+    puts "Month, year, description and value required"
+    false
+  else
+    true
+  end
 end
 
 init(ARGV[0])
