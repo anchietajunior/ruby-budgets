@@ -9,7 +9,7 @@ def init(option)
   when "list"
     list_budgets(ARGV[1])
   when "details"
-    show_budget
+    show_budget(ARGV[1], ARGV[2])
   when "income"
     add_income
   when "expense"
@@ -27,49 +27,57 @@ end
 
 def add_income
   return unless year_month_description_and_value?
-
-  create_folder_and_file unless budget_exists?
-  File.open("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt", 'a') { |file| file.write("i #{ARGV[3]} #{ARGV[4]}\n") }
-  p "Income added"
+  type, month, year, desc, value = ARGV
+  create_folder_and_file unless budget_exists?(month, year)
+  File.open("./budgets/#{year}/#{month}.txt", 'a') { |file| file.write("i #{desc} #{value}\n") }
+  show_budget(month, year)
 end
 
 def add_expense
   return unless year_month_description_and_value?
-
-  create_folder_and_file unless budget_exists?
-  File.open("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt", 'a') { |file| file.write("e #{ARGV[3]} #{ARGV[4]}\n") }
-  p "Expense added"
+  type, month, year, desc, value = ARGV
+  create_folder_and_file unless budget_exists?(month, year)
+  File.open("./budgets/#{year}/#{month}.txt", 'a') { |file| file.write("e #{desc} #{value}\n") }
+  show_budget(month, year)
 end
 
 def remove_item
   return unless year_month_and_description? 
-  
-  file_lines = ''
-  type = ''
-  if ARGV[1] == 'income'
-    type = 'i'
-  elsif ARGV[1] == 'expense'
-    type = 'e'
-  else
-    puts "Type not found"
+
+  file = "./budgets/#{ARGV[3]}/#{ARGV[2]}.txt"
+
+  if File.zero?(file)
+    puts "Empty Budget"
     return
   end
 
-  IO.readlines("./budgets/#{ARGV[3]}/#{ARGV[2]}.txt", "r") do |line|
-    item_type   = line.last.split(" ")[0]
-    description = line.last.split(" ")[1]
-    files_lines += line unless item_type == type && description == ARGV[4] 
+  file_lines = ''
+  type = ARGV[1] == 'income' ? 'i' : 'e'
+
+  File.open(file, "r") do |file|
+    file.each_line do |line|
+      if line == "\n"
+        next
+      end
+      line_type, desc, value = line.split(" ")
+      file_lines += line unless type == line_type && desc == ARGV[4]
+    end
   end
 
-  File.open("./budgets/#{ARGV[3]}/#{ARGV[2]}.txt", "w") do |file|
-    file.puts file_lines
+  unless file_lines.empty?
+    File.open(file, "w") do |file|
+      file.puts file_lines
+    end
   end
+  show_budget(ARGV[2], ARGV[3])
 end
 
-def show_budget
-  return unless year_and_month? 
-
-  budget_exists? ? mount_table_values(ARGV[1], ARGV[2]) : "Budget not found"
+def show_budget(month, year)
+  if month && year 
+    budget_exists?(month, year) ? mount_table_values(month, year) : "Budget not found"
+  else
+    puts "Month and Year Required"
+  end
 end
 
 def mount_table_values(month, year)
@@ -111,6 +119,13 @@ def table(title, incomes, expenses)
     end
     t.add_separator
     t << ['Total Expenses', format_value(expenses.reduce(0) { |sum, obj| sum + obj.last })]
+    t.add_separator
+    t << ['Budget', 'Total']
+    t.add_separator
+    t << ['Total', format_value(
+      incomes.reduce(0) { |sum, obj| sum + obj.last } - 
+      expenses.reduce(0) { |sum, obj| sum + obj.last }
+    )]
   end
   puts table
 end
@@ -131,17 +146,8 @@ def create_folder_and_file
   File.new("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt", "w")
 end
 
-def budget_exists?
-  File.exists?("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt")
-end
-
-def year_and_month?
-  if ARGV[1].nil? || ARGV[2].nil?
-    puts "Month and year required"
-    false
-  else
-    true
-  end
+def budget_exists?(month, year)
+  File.exists?("./budgets/#{year}/#{month}.txt")
 end
 
 def year_month_and_description?
