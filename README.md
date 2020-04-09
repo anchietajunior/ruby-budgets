@@ -2,7 +2,7 @@
 
 Create Budgets with Ruby from Terminal
 
-![Ruby Budgets](budget.gif)
+![Ruby Budgets](budget.png)
 
 ## How to use it?
 
