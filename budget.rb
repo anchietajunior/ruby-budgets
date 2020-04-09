@@ -6,8 +6,6 @@ Bundler.require
 
 def init(option)
   case option
-  when "-c"
-    create_budget(ARGV[1], ARGV[2])
   when "list"
     list_budgets(ARGV[1])
   when "details"
@@ -27,6 +25,7 @@ end
 
 def add_income
   (puts "Month, year, description and value required" and return) unless ARGV[1] && ARGV[2] && ARGV[3] && ARGV[4]
+  create_folder_and_file unless budget_exists?
   File.open("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt", 'a') { |file| file.write("i #{ARGV[3]} #{ARGV[4]}\n") }
   p "Income added"
 end
@@ -39,7 +38,7 @@ end
 
 def show_budget
   (puts "Month and year required" and return) unless ARGV[1] && ARGV[2]
-  budget_exists?(ARGV[1], ARGV[2]) ? mount_table_values(ARGV[1], ARGV[2]) : "Budget not found"
+  budget_exists? ? mount_table_values(ARGV[1], ARGV[2]) : "Budget not found"
 end
 
 def mount_table_values(month, year)
@@ -85,16 +84,6 @@ def table(title, incomes, expenses)
   puts table
 end
 
-def create_budget(month, year)
-  p "FILE Exists? #{budget_exists?(month, year)}"
-  if month && year
-    create_folder_and_file(month, year) unless budget_exists?(month, year)
-    p "Budget created"
-  else
-    puts "Month and year required"
-  end
-end
-
 def list_budgets(year)
   (puts "Year required to list budgets" and return) unless year
   files = Dir["./budgets/#{year}/**/*.txt"]
@@ -106,13 +95,13 @@ def list_budgets(year)
   end
 end
 
-def create_folder_and_file(month, year)
-  system 'mkdir', '-p', "budgets/#{year}"
-  File.new("./budgets/#{year}/#{month}.txt", "w")
+def create_folder_and_file
+  system 'mkdir', '-p', "budgets/#{ARGV[2]}"
+  File.new("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt", "w")
 end
 
-def budget_exists?(month, year)
-  File.exists?("./budgets/#{year}/#{month}.txt")
+def budget_exists?
+  File.exists?("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt")
 end
 
 init(ARGV[0])
