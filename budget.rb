@@ -32,6 +32,7 @@ end
 
 def add_expense
   (puts "Month, year, description and value required" and return) unless ARGV[1] && ARGV[2] && ARGV[3] && ARGV[4]
+  create_folder_and_file unless budget_exists?
   File.open("./budgets/#{ARGV[2]}/#{ARGV[1]}.txt", 'a') { |file| file.write("e #{ARGV[3]} #{ARGV[4]}\n") }
   p "Expense added"
 end
