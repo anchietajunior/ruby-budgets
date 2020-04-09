@@ -104,23 +104,17 @@ end
 
 def table(title, incomes, expenses)
   table = Terminal::Table.new :title => title do |t|
-    t << ['Income', 'Value']
-    t.add_separator
     incomes.each do |income|
       t << [income.first, format_value(income.last)]
     end
     t.add_separator
     t << ['Total Incomes', format_value(incomes.reduce(0) { |sum, obj| sum + obj.last })]
     t.add_separator
-    t << ['Expense', 'Value']
-    t.add_separator
     expenses.each do |expense|
       t << [expense.first, format_value(expense.last)]
     end
     t.add_separator
     t << ['Total Expenses', format_value(expenses.reduce(0) { |sum, obj| sum + obj.last })]
-    t.add_separator
-    t << ['Budget', 'Total']
     t.add_separator
     t << ['Total', format_value(
       incomes.reduce(0) { |sum, obj| sum + obj.last } - 
